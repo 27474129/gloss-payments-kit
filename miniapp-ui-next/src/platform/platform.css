@@ -1,0 +1,46 @@
+/* ---------------------------------------------------------------------------
+   Платформенный слой стилей. Единственное место, где CSS знает про Telegram,
+   MAX и safe-area; атрибут html[data-platform] ставит platform/bridge.ts.
+   Дизайн-токены (цвет, радиусы) тут не живут — см. styles/tokens.css.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Безопасные зоны. Telegram в полноэкранном режиме отдаёт свои значения в
+     --tg-*: верх — под кнопки «закрыть/меню», низ — под системный жест. */
+  --safe-top: max(env(safe-area-inset-top), var(--tg-content-safe-area-inset-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom), var(--tg-safe-area-inset-bottom, 0px));
+
+  /* Отступ страницы под нативную шапку — общий для BrandHeader и VideoSheet. */
+  --header-pt: calc(3.25rem + var(--safe-top));
+  /* Верхняя кромка для липких элементов раздела (панель категорий): та же зона
+     под нативные кнопки, но без декоративного запаса шапки. */
+  --sticky-pt: calc(2.5rem + var(--safe-top));
+}
+
+/* MAX рисует собственную непрозрачную шапку и начинает вебвью под ней, но iOS
+   всё равно сообщает физический вырез. Добавлять env(safe-area-inset-top) поверх
+   (как нужно Telegram) значит учесть его дважды и оставить ~110px пустоты под
+   шапкой MAX. Под MAX хватает базового декоративного отступа. */
+:root[data-platform="max"] {
+  --safe-top: 0px;
+  --header-pt: 3.25rem;
+  --sticky-pt: 2.5rem;
+}
+
+/* MAX на Android не глушит системную «резинку» WebView: у края страницы лента
+   растягивается и будто зависает на картинках. Telegram гасит её сам. */
+html[data-platform="max"],
+html[data-platform="max"] body {
+  overscroll-behavior-y: none;
+}
+
+/* WebView MAX начинает «перетаскивать» картинку, если прокрутка началась
+   пальцем на ней: лента встаёт, по экрану едет растянутая копия кадра.
+   Картинки ничего не нажимают сами — тап принимает карточка-кнопка вокруг, —
+   поэтому в MAX они просто не ловят касания. */
+html[data-platform="max"] img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}

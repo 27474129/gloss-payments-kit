@@ -1,0 +1,479 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./styles/fonts.css";
+@import "./styles/tokens.css";
+@import "./platform/platform.css";
+
+@theme {
+  /* Типошкала: шесть шагов. Заголовочные шаги (display/title/headline) набраны
+     Unbounded — см. @layer base ниже; текст — Onest. */
+  --text-display: 1.75rem;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 800;
+
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 700;
+
+  --text-headline: 1rem;
+  --text-headline--line-height: 1.25;
+  --text-headline--letter-spacing: -0.015em;
+  --text-headline--font-weight: 700;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.45;
+  --text-body--letter-spacing: 0;
+  --text-body--font-weight: 400;
+
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.25;
+  --text-label--letter-spacing: 0;
+  --text-label--font-weight: 600;
+
+  --text-caption: 0.6875rem;
+  --text-caption--line-height: 1;
+  --text-caption--letter-spacing: 0.01em;
+  --text-caption--font-weight: 700;
+}
+
+@theme inline {
+  --font-sans: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "Unbounded", "Onest", system-ui, "Segoe UI", Arial, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Поверхности и текст доступны как утилиты: bg-surface-2, text-muted и т.д. */
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-outline: var(--outline);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-overlay: var(--overlay);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-press: var(--brand-press);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-text: var(--brand-text);
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-ink: var(--accent-2-ink);
+  --color-accent-3: var(--accent-3);
+  --color-accent-3-ink: var(--accent-3-ink);
+  --color-energy: var(--energy);
+  --color-energy-edge: var(--energy-edge);
+  --color-energy-plate: var(--energy-plate);
+
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply bg-background font-sans;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply m-0 bg-background text-foreground;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Заголовки — Unbounded, как на лендинге. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .text-display,
+  .text-title,
+  .text-headline {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  /* Чанк: плотный контур + смещённая тень без размытия (язык лендинга). Цвет
+     контура — --outline, тени — --chunk-shadow-color (в тёмной теме — приглушённый
+     контур и тень темнее полотна). */
+  .chunk {
+    border: var(--chunk);
+    box-shadow: var(--chunk-shadow);
+  }
+
+  .chunk-sm {
+    border: var(--chunk);
+    box-shadow: var(--chunk-shadow-sm);
+  }
+
+  /* Кнопка нажимается вниз, как .btn на лендинге. */
+  .chunk-press {
+    transition:
+      transform var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-fast) var(--ease-standard),
+      background-color var(--dur-fast) var(--ease-standard);
+  }
+
+  .chunk-press:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--chunk-shadow-color);
+  }
+
+  /* Единственный способ отрисовать медиа-плитку: подложка под пустые
+     плейсхолдеры (нет картинки, идёт генерация). */
+  .media-tile {
+    background-color: var(--surface-2);
+  }
+
+  .media-image {
+    animation: media-reveal var(--dur-base) ease-out both;
+  }
+
+  /* Появление карточек каскадом. Задержку задаёт --i в разметке. */
+  .rise-in {
+    animation: rise-in var(--dur-base) var(--ease-standard) both;
+    animation-delay: calc(var(--i, 0) * 28ms);
+  }
+
+  /* Горизонтальная лента: скрытый скроллбар + снап.
+     Отступ снизу даёт место тени чанков (она ниже карточки на 4px). */
+  .rail {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    /* Явно, иначе браузер считает overflow-y тоже auto: лента становится
+       вертикальным скроллером на пару пикселей, и вертикальный свайп,
+       начатый на карточке, «прилипает» к ней. */
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    /* Тень и контур карточек не должны резаться краем ленты. */
+    padding: 2px 2px 8px;
+    margin: -2px -2px 0;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail > * {
+    scroll-snap-align: start;
+  }
+}
+
+@keyframes media-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Идущая генерация: узкий блик проходит по кадру. */
+@keyframes generation-sweep {
+  from {
+    transform: translate3d(-160%, 0, 0) rotate(14deg);
+  }
+  to {
+    transform: translate3d(260%, 0, 0) rotate(14deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.generation-overlay {
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.generation-overlay__light {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 246 234 / 0.06) 22%,
+    rgb(255 246 234 / 0.4) 50%,
+    rgb(255 246 234 / 0.08) 62%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  animation: generation-sweep 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
+/* «Изменить» v2: готовый кадр проявляется на месте исходника. */
+@keyframes edit-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.edit-reveal {
+  animation: edit-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Sonner задаёт своё системное семейство на корне тостера — возвращаем Onest. */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
+[data-sonner-toast][data-styled="false"] {
+  transition:
+    transform 520ms var(--ease-sheet),
+    opacity 360ms ease,
+    height 520ms var(--ease-sheet) !important;
+}
+
+/* В Telegram Desktop/Web шит может быть почти таким же широким, как на
+   телефоне, но заметно ниже. У карточки «Образа» медиа 4:5; без этого
+   ограничения оно занимало весь max-h шита и прятало кнопку действия. */
+@media (hover: hover) and (pointer: fine) {
+  [data-sheet-media],
+  [data-sheet-media] > * {
+    max-height: max(0px, calc(76svh - 13.5rem));
+  }
+}
+
+/* Промо-баннеры инструментов (PromoCarousel). Тон — цвет карточки лендинга:
+   коралловая hero-карточка, фиолетовая финальная, тёплая оранжевая. Подпись на
+   коралле и оранже — чернильная (контраст), на фиолете — белая. */
+.promo {
+  position: relative;
+  isolation: isolate;
+  border: var(--chunk);
+  box-shadow: var(--chunk-shadow);
+  color: var(--promo-ink);
+}
+
+.promo--coral {
+  --promo-ink: #1f1442;
+  background:
+    radial-gradient(circle at 85% 12%, rgb(255 161 61 / 0.85) 0, rgb(255 161 61 / 0) 38%),
+    linear-gradient(135deg, #ff5c5c 0, #ff7a5c 100%);
+}
+
+.promo--violet {
+  --promo-ink: #ffffff;
+  background:
+    radial-gradient(circle at 15% 95%, rgb(255 92 92 / 0.55) 0, rgb(255 92 92 / 0) 48%),
+    #5b3df5;
+}
+
+.promo--orange {
+  --promo-ink: #1f1442;
+  background: linear-gradient(135deg, #ffa13d 0, #ffc46b 100%);
+}
+
+.promo--cream {
+  --promo-ink: var(--text);
+  background: var(--surface-1);
+}
+
+.promo__sheen {
+  position: absolute;
+  inset: -20% auto -20% 0;
+  width: 38%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.22), transparent);
+  filter: blur(8px);
+  transform: translate3d(-160%, 0, 0) rotate(14deg);
+  animation: promo-sheen 5.5s cubic-bezier(0.45, 0, 0.55, 1) 1.2s infinite;
+}
+
+@keyframes promo-sheen {
+  0% {
+    transform: translate3d(-160%, 0, 0) rotate(14deg);
+  }
+  38%,
+  100% {
+    transform: translate3d(320%, 0, 0) rotate(14deg);
+  }
+}
+
+.promo__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1.5px solid #1f1442;
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  background: var(--accent-3);
+  color: #1f1442;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.promo__dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: currentColor;
+  animation: promo-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes promo-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.promo__art {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 0;
+  width: 4.25rem;
+  height: 3.5rem;
+}
+
+.promo__tile {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: 2.375rem;
+  height: 3rem;
+  border: 2px solid #1f1442;
+  border-radius: 0.5rem;
+  color: #1f1442;
+  box-shadow: 2px 3px 0 #1f1442;
+}
+
+.promo__tile--pin {
+  left: 0;
+  top: 0.25rem;
+  transform: rotate(-9deg);
+  background: #ffd9d4;
+}
+
+.promo__tile--you {
+  right: 0;
+  top: 0;
+  transform: rotate(7deg);
+  background: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-image,
+  .rise-in,
+  .promo__sheen,
+  .promo__dot {
+    animation: none;
+  }
+
+  .promo__sheen {
+    display: none;
+  }
+
+  .edit-reveal {
+    animation: none;
+  }
+
+  .generation-overlay__light {
+    animation: none;
+    opacity: 0.35;
+    transform: translate3d(45%, 0, 0) rotate(14deg);
+  }
+}
+
+/* «Изменить» v2: пока в поле ввода фокус (на телефоне открыта клавиатура), нижнее меню прячем —
+   иначе оно поднимается над клавиатурой и закрывает кнопку «Создать». Флаг ставит tabs/EditTab. */
+html[data-edit-keyboard] nav[data-bottom-nav] {
+  display: none;
+}
+
+/* Плашка «Выбор большинства» у пакета: золото энергии, тёмная подпись. */
+.pay-popular {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--energy);
+  color: var(--energy-edge);
+  font-size: var(--text-caption);
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--energy-edge) 55%, transparent);
+}

@@ -1,0 +1,64 @@
+# Paste the fields into `class Settings(BaseSettings)` of app/core/config.py, the properties after the other @property blocks.
+# Values are defaults only: real keys come from the environment (see env.example).
+# If your config already has TBANK_TERMINAL_KEY / TBANK_PASSWORD / TBANK_API_BASE / TBANK_NOTIFICATION_URL / TBANK_TEST_USER_IDS /
+# TBANK_ROLLOUT_PERCENT (your earlier T-Bank integration has them), keep ONE copy of each; delete TBANK_CHECKOUT.
+
+# ---------------- fields ----------------
+    # T-Bank internet acquiring (Т-Касса, API v2) as a second card provider next to YooKassa. Keys come only from
+    # the environment. Which provider a new payment goes to: ``tbank_provider_for`` (app/services/payment_gateway.py).
+    # ``PAYMENT_PROVIDER=yookassa`` + ``TBANK_ROLLOUT_PERCENT=0`` + empty ``TBANK_FORCE_USER_IDS`` = T-Bank is off.
+    TBANK_TERMINAL_KEY: str = ""
+    TBANK_PASSWORD: str = ""
+    TBANK_API_BASE: str = "https://securepay.tinkoff.ru/v2"
+    # Public URL T-Bank posts payment notifications to (the Caddy allowlist of the API host must pass it).
+    TBANK_NOTIFICATION_URL: str = "https://api.your-domain.example/api/v1/payments/tbank/notify"
+    # The seller is a self-employed person: receipts come from «Мой налог», so no 54-FZ Receipt by default.
+    TBANK_SEND_RECEIPT: bool = False
+    PAYMENT_PROVIDER: str = "yookassa"  # yookassa | tbank — where everyone goes, the rollout percent aside
+    TBANK_ROLLOUT_PERCENT: int = 0  # 0..100 of the users (by a stable hash of users.id) when PAYMENT_PROVIDER=yookassa
+    TBANK_FORCE_USER_IDS: str = ""  # users.id that always pay through T-Bank (owner smoke test)
+    # Test terminal (preview only): payments are written with status ``test_owner`` (every report and the NPD receipts
+    # read only ``succeeded``), only the accounts of ``TBANK_TEST_USER_IDS`` (users.id) may pay. Never set on production.
+    TBANK_TEST_MODE: bool = False
+    TBANK_TEST_USER_IDS: str = ""
+    # Own buttons in the Mini App's sheet (SBP / SberPay / T-Pay by the bank's link API, the card in an iframe with our
+    # own «Назад»); off = the sheet has the single «Оплатить» button as before (``TBANK_TOP_LEVEL`` decides how the form opens).
+    TBANK_BUTTONS: bool = True
+    # The chat bots: SberPay · SBP · T-Pay · card buttons (``pay_buttons``) and our page with the choice instead of the
+    # bank's own form. Off (11.11, owner's call): the bots open the T-Bank form, the payment still gets the wallet flags.
+    TBANK_BOT_BUTTONS: bool = False
+    # Old way (10.11, before the buttons): the T-Bank form opens in the same WebView of the Mini App and brings the buyer
+    # back to the page they left from (``return_to``). The form has no «back»; off by default.
+    TBANK_TOP_LEVEL: bool = False
+    # The card form in an iframe inside the sheet (``embed`` in the create request); inside an iframe T-Bank shows only the card.
+    TBANK_EMBED: bool = True
+    # Preview only: wallets (``sbp,sberbank,tinkoff_bank``) that the buttons show without asking the bank.
+    TBANK_WALLETS_ASSUME: str = ""
+    # Extra origins (comma-separated) the T-Bank return page may send the buyer back to, besides our own Mini App hosts.
+    MINIAPP_RETURN_ORIGINS: str = ""
+    # Where T-Bank sends the buyer after the form (SuccessURL/FailURL): a page of ours that tells the Mini App.
+    TBANK_RETURN_URL: str = "https://app.your-domain.example/api/v1/miniapp/pay-return"
+    # Extra CA file for the T-Bank API client (securepay.* is signed by the Russian Trusted CA); empty = bundled file.
+    TBANK_CA_BUNDLE: str = ""
+
+    # ---- other settings the kit reads (add next to your BOT_USERNAME / MAX_BOT_USERNAME if missing) ----
+    BRAND_NAME: str = "YOUR_BRAND"   # product name used in payment descriptions ("<brand> — пакет N энергии") and on the bank-return pages
+    # Mini App top-up sheet on/off: False = the energy plate deep-links to the bot as before.
+    MINIAPP_PAYWALL_INAPP: bool = False
+
+# ---------------- properties ----------------
+    @property
+    def tbank_test_user_ids(self) -> frozenset[int]:
+        return frozenset(
+            int(value.strip())
+            for value in self.TBANK_TEST_USER_IDS.split(",")
+            if value.strip().isdigit()
+        )
+
+    @property
+    def tbank_force_user_ids(self) -> frozenset[int]:
+        return frozenset(
+            int(value.strip())
+            for value in self.TBANK_FORCE_USER_IDS.split(",")
+            if value.strip().isdigit()
+        )

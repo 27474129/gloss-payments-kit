@@ -1,0 +1,39 @@
+"""TEMPLATE. How a payment was paid: type + masked card, kept for the ways-to-pay split and anti-abuse monitoring.
+
+Needed by `save_payment_method` / `payment_method_type` (T-Bank method detection, scripts/backfill_tbank_method.py).
+Skip it ONLY if the table yookassa_payments in your DB (describe it in psql) already has payment_method_type, card_first6, card_last4, card_type, card_country.
+Card first6/last4 are personal data: clear them when a user's data is erased.
+
+Revision ID: <NNN>_yookassa_payment_method   (run it BEFORE <NNN+1>_tbank_acquiring)
+Revises: <YOUR CURRENT alembic HEAD>
+"""
+from typing import Sequence, Union
+
+from alembic import op
+
+# TEMPLATE: set both lines to your chain, rename the file to <NNN>_yookassa_payment_method.py
+revision: str = "NNN_yookassa_payment_method"
+down_revision: Union[str, None] = "PUT_YOUR_DOWN_REVISION_HERE"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS payment_method_type TEXT")
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS card_first6 VARCHAR(6)")
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS card_last4 VARCHAR(4)")
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS card_type TEXT")
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS card_country TEXT")
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_yookassa_payments_card ON yookassa_payments (card_first6, card_last4) "
+        "WHERE card_last4 IS NOT NULL"
+    )
+
+
+def downgrade() -> None:
+    op.execute("DROP INDEX IF EXISTS ix_yookassa_payments_card")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS card_country")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS card_type")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS card_last4")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS card_first6")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS payment_method_type")

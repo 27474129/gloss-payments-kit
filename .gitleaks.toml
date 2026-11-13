@@ -1,0 +1,6 @@
+# The only known finding is the public example from the bank's documentation (demo terminal 1234567890DEMO,
+# demo password 11111111111): the unit test checks that our signature gives the very token printed in the docs.
+[allowlist]
+description = "public documentation examples used by the signature tests"
+regexes = ['''1c0964277d0213349243065a0d5b838b8e90d2d25f740d0f2767836e710e80c8''', '''72dd466f[0-9a-f]{56}''']
+paths = ['''backend/tests/test_tbank_acquiring\.py''']

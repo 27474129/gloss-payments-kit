@@ -1,0 +1,48 @@
+"""T-Bank internet acquiring as a second provider in the same payments table.
+
+``yookassa_payments`` keeps being THE table of card payments: Pulse, the NPD receipts, refunds of the support
+inbox, discount offers, bonuses and analytics all read it. A T-Bank payment is a row of it with
+``provider = 'tbank'`` and ``yookassa_id`` = the T-Bank ``PaymentId`` (digits, so it never meets a YooKassa
+uuid; the column is UNIQUE). Nothing is renamed or dropped; code that does not know the columns keeps working.
+
+* ``provider``          — ``yookassa`` (default, every existing row) | ``tbank``.
+* ``provider_order_id`` — the ``OrderId`` we sent to T-Bank ``Init`` (the notification and ``GetState`` echo it).
+* ``refunded_rubles``   — how much of the payment went back to the buyer (T-Bank ``Cancel`` / notification);
+  the row stays ``succeeded`` like a refunded YooKassa payment. The NPD sync reads it to void/reissue the receipt.
+
+Revision ID: <NNN>_tbank_acquiring   (take the next number of YOUR chain)
+Revises: <YOUR CURRENT alembic HEAD>
+
+Idempotent (IF NOT EXISTS), so it is safe if the columns were added by hand before.
+"""
+from typing import Sequence, Union
+
+from alembic import op
+
+# TEMPLATE: set both lines to your chain (`alembic heads` shows the current head), then rename the file to <NNN>_tbank_acquiring.py
+revision: str = "NNN_tbank_acquiring"
+down_revision: Union[str, None] = "PUT_YOUR_DOWN_REVISION_HERE"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS provider VARCHAR(16) NOT NULL DEFAULT 'yookassa'")
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS provider_order_id VARCHAR(64)")
+    op.execute("ALTER TABLE yookassa_payments ADD COLUMN IF NOT EXISTS refunded_rubles NUMERIC(12,2) NOT NULL DEFAULT 0")
+    op.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS ux_yookassa_payments_provider_order_id ON yookassa_payments (provider_order_id) "
+        "WHERE provider_order_id IS NOT NULL"
+    )
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_yookassa_payments_tbank ON yookassa_payments (status, created_at) "
+        "WHERE provider = 'tbank'"
+    )
+
+
+def downgrade() -> None:
+    op.execute("DROP INDEX IF EXISTS ix_yookassa_payments_tbank")
+    op.execute("DROP INDEX IF EXISTS ux_yookassa_payments_provider_order_id")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS refunded_rubles")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS provider_order_id")
+    op.execute("ALTER TABLE yookassa_payments DROP COLUMN IF EXISTS provider")

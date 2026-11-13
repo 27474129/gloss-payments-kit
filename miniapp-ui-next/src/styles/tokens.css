@@ -1,0 +1,190 @@
+/* ---------------------------------------------------------------------------
+   YOUR_BRAND — дизайн-токены Mini App. ЕДИНСТВЕННЫЙ источник цвета, радиусов,
+   контура и моушна; одинаков для Telegram- и MAX-сборки. Платформенные
+   отличия (safe-area, шапка мессенджера) — только в platform/platform.css.
+
+   Айдентика — лендинг your-domain.example (frontend/css/base.css): коралл #ff5c5c,
+   фиолет #5b3df5, крем #fff6ea, чернильный #1f1442. «Чанки» — плотный контур
+   + смещённая тень без размытия; скругления крупные.
+
+   Приложение всегда светлое («кремовая» тема, как лендинг): bridge ставит
+   html[data-theme="light"] независимо от темы клиента и системы. Тёмные токены
+   ниже сохранены, но не применяются (переключателя темы нет).
+
+   Роли цвета:
+     --brand     — главное действие экрана (фиолет, как .btn-violet на лендинге),
+                   активный сегмент/чип/вкладка. Всегда заливкой, не текстом.
+     --accent-2  — деньги и новизна (коралл): «+» на балансе, бейджи, искорки.
+     --accent-3  — тёплый второй акцент (оранжевый): подсветка, промо.
+     --outline   — цвет контура чанков: чернильный на светлой, приглушённый
+                  лавандовый (тонкий, 1.5px) на тёмной; тень — --chunk-shadow-color.
+   --------------------------------------------------------------------------- */
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: only light;
+
+  /* Поверхности: полотно / карточки и шиты / контролы / нажатие */
+  --surface-0: #fff6ea;
+  --surface-1: #ffffff;
+  --surface-2: #ffebd6;
+  --surface-3: #ffdcb9;
+
+  --outline: #1f1442;
+  --outline-w: 2px;
+  --chunk-shadow-color: #1f1442;
+  --line: rgb(31 20 66 / 0.14);
+  --line-strong: rgb(31 20 66 / 0.3);
+  --selection-line: #1f1442;
+  --overlay: rgb(31 20 66 / 0.55);
+
+  --text: #1f1442;
+  --text-muted: #5e5478;
+  --text-faint: #6d6388;
+
+  --brand: #5b3df5;
+  --brand-hover: #4a2be0;
+  --brand-press: #3c20c4;
+  --brand-ink: #ffffff;
+  /* Фиолет как цвет текста/иконки на полотне (ссылки, «все ›»). */
+  --brand-text: #4a2be0;
+
+  --accent-2: #ff5c5c;
+  --accent-2-ink: #1f1442;
+  --accent-3: #ffa13d;
+  --accent-3-ink: #1f1442;
+
+  /* Энергия (внутренняя валюта): янтарная молния с тёмным контуром на
+     фиолетовой монете. Заливка/монета ≥3:1 в обеих темах (check-contrast). */
+  --energy: #ffc83d;
+  --energy-edge: #1f1442;
+  --energy-plate: #5b3df5;
+
+  --danger: #c9283a;
+  --warning: #a8530a;
+
+  /* Выбранный сегмент/чип: заливка брендом с белой подписью. */
+  --segment-track: var(--surface-2);
+  --segment-active: var(--brand);
+  --segment-active-ink: var(--brand-ink);
+
+  /* Блик на фото-карточках под подписью — чернильный, не чёрный. */
+  --scrim: 31 20 66;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: only dark;
+
+  /* Тёмная палитра — отдельная, не инверсия светлой. Холодный индиго с одним
+     оттенком (≈255°), уровни поднимаются вверх по светлоте: полотно → карточки
+     и шиты → контролы/дорожки → нажатие. Шаг между уровнями 1.15–1.26:1, так что
+     слои читаются без белых рамок. Контур — приглушённый лавандовый, тонкий
+     (1.5px), тень — глубже полотна и без блика. Коэффициенты считает
+     scripts/check-contrast.mjs. */
+  --surface-0: #0f0a21;
+  --surface-1: #1c1645;
+  --surface-2: #2a2164;
+  --surface-3: #3a2f7d;
+
+  --outline: #6a5cb8;
+  --outline-w: 1.5px;
+  --chunk-shadow-color: #05020f;
+  --line: rgb(190 176 255 / 0.16);
+  --line-strong: #4a3f94;
+  --selection-line: #9a8df0;
+  --overlay: rgb(5 2 15 / 0.74);
+
+  --text: #f5f0fa;
+  --text-muted: #d0c8ec;
+  --text-faint: #b2a8da;
+
+  /* Фиолет чуть светлее и спокойнее, чем на светлой теме, чтобы не «гореть» на
+     индиго; белая подпись остаётся ≥4.5:1. Hover/press — темнее, как на светлой. */
+  --brand: #6a54f1;
+  --brand-hover: #5f48ea;
+  --brand-press: #5238da;
+  --brand-ink: #ffffff;
+  --brand-text: #c0b4ff;
+
+  /* Коралл сдвинут к розовому — ближе к фиолету по тону, мягче на тёмном. */
+  --accent-2: #ff7b86;
+  --accent-2-ink: #180f33;
+  --accent-3: #f6a863;
+  --accent-3-ink: #180f33;
+
+  --energy: #ffc83d;
+  --energy-edge: #180f33;
+  --energy-plate: #5b3df5;
+
+  --danger: #ff8a94;
+  --warning: #ffbd6e;
+
+  --segment-track: var(--surface-2);
+  --segment-active: var(--brand);
+  --segment-active-ink: var(--brand-ink);
+
+  --scrim: 15 10 33;
+}
+
+:root {
+  /* Контур чанка и его тень — один язык для кнопок, карточек, шитов, навигации. */
+  --chunk: var(--outline-w) solid var(--outline);
+  --chunk-shadow: 0 4px 0 var(--chunk-shadow-color);
+  --chunk-shadow-sm: 0 3px 0 var(--chunk-shadow-color);
+  --chunk-shadow-lg: 0 6px 0 var(--chunk-shadow-color);
+
+  /* Радиусы — шкала лендинга (14 / 24 / 36) плюс промежуточные для мобильного. */
+  --r-xs: 8px;
+  --r-sm: 14px;
+  --r-md: 22px;
+  --r-lg: 28px;
+  --r-xl: 36px;
+
+  /* Размеры карточек в лентах — от базового кегля, не от 100vw. */
+  --card-portrait: 9.5rem;
+  --card-portrait-images: 11.5rem;
+  --card-portrait-trends: 13rem;
+  --card-wide: 17.5rem;
+  --card-promo: 14rem;
+
+  /* Вертикальный ритм плавающих слоёв над контентом.
+     --nav-h — высота нижней навигации (components/BottomNav.tsx), замерено: контур
+     панели 2×2px + p-1.5 (0.75rem) + кнопка (контур 2×2px + py-2 1rem + иконка
+     1.375rem + gap-1 0.25rem + подпись 0.6875rem). Поменяете паддинги/иконку —
+     обновите это число, от него считаются все просветы над панелью. */
+  --nav-h: 4.5625rem;
+  --nav-gap: 0.75rem;
+  --nav-gap-safe: calc(var(--nav-gap) + var(--safe-bottom, 0px));
+  --nav-clearance: calc(var(--nav-h) + var(--nav-gap-safe));
+  --content-pb-nav: calc(var(--nav-clearance) + 2rem);
+  --floating-pb-nav: calc(var(--nav-clearance) + 0.75rem);
+  --header-filter-gap: 1rem;
+
+  /* Моушн */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 380ms;
+
+  /* --- Мост в shadcn: примитивы читают эти имена. --- */
+  --background: var(--surface-0);
+  --foreground: var(--text);
+  --card: var(--surface-1);
+  --card-foreground: var(--text);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--text);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-ink);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-2);
+  --accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brand);
+  --radius: var(--r-md);
+}
